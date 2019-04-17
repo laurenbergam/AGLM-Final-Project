@@ -1,6 +1,7 @@
 # AGLM-Final-Project
-* Predict diagnosis using logistic regression, possibly cross-validation
-* 2x2 table
-* Which test component is most indicative of alzheimer's disease?
-* Create new variable based on age_visit to run Poisson regression
-* Predict cognition score using linear regression
+* Augie feat Peter: Predict diagnosis using logistic regression, possibly cross-validation
+* Lauren: 2x2 table
+* Shawn: Which test component is most indicative of alzheimer's disease?
+* Augie: Compare how those with AD vs non-AD may perform on the tests over time
+* Peter: Predict cognition score using linear regression
+* Ryan: Intro, Conclusion, model factoring in depression scale
