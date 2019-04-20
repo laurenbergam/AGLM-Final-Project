@@ -1,5 +1,5 @@
 # AGLM-Final-Project
-* Augie feat Peter: Predict diagnosis using logistic regression, possibly cross-validation
+* Shawn feat Peter: Predict diagnosis using logistic regression, possibly cross-validation
 * Lauren: 2x2 table
 * Augie: Which test component is most indicative of alzheimer's disease?
 * Shawn: Compare how those with AD vs non-AD may perform on the tests over time
