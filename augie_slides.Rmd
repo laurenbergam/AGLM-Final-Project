@@ -53,11 +53,12 @@ cat("AIC: ", summary_model1$aic)
 
 ## Stepwise Test
 
-- Running a step test on our model shows us that if we were to drop log_mem_imm, our AIC would go up by more than 200 points
+- Running a step test on our model shows us how our AIC would be affected if we were to drop different variables. If we were to drop log_mem_imm, our AIC would go up by more than 200 points.
 - Also, dropping trails_a actually decreases our AIC. The rest of the variables are helping our AIC.
 
 ```{r, echo = TRUE, size = "tiny"}
-step(model1)
+step(model1, trace = 1)
+
 ```
 
 
