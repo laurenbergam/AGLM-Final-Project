@@ -1,0 +1,77 @@
+---
+title: "Final Project Slides"
+author: "Augustus Ge"
+date: "April 21, 2019"
+output: beamer_presentation
+fontsize: 6pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library("miceadds")
+library("boot")
+library("corrplot")
+nacc_unique1 = read.csv("C:/Brown Biostats/PHP 2514/Final Project/nacc_unique1.csv")
+
+```
+
+```{r, echo = FALSE}
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
+```
+
+## Variable Explanation 
+
+- Our variables are log_mem_imm, dspan_for, dspan_back, animal, vegetable, trails_a, trails_b, dig_sym, bnt
+  - log_mem_imm
+  - dspan_for and dspan_back are forward and backward memorization of a sequence of digits
+  - animal and vegetable are the amount of unique animals and vegetables one can name in one minute
+  - trails_a and trails_b are connecting dots of digits and letters, total time to complete
+  - dig_sym is the digit symbol test substituting digits with their respective symbols, total time to complete
+  - bnt is the Boston Naming Test, subjects are to name drawings of common items, max of 30
+- DEMENTED is the dementia status of subjects, with DEMENTED = 1 being dementia.
+  
+## Modeling
+
+- We create our first model using all of these variables 
+
+```{r, echo = TRUE, size = "tiny"}
+model1 = glm(DEMENTED ~ log_mem_imm + dspan_for + dspan_back + 
+               animal + vegetable + trails_a + trails_b + dig_sym +
+              bnt, data = nacc_unique1, family= binomial)
+summary_model1 = summary(model1)
+summary_model1$coefficients
+cat("AIC: ", summary_model1$aic)
+
+```
+
+- From our summary, we see that log_mem_imm has the most significant p-value. Additionally, dspan_for, dspan_back, and trails_a are not significant at the .05 level.
+- AIC is 1047.1
+
+## Stepwise Test
+
+- Running a step test on our model shows us how our AIC would be affected if we were to drop different variables. If we were to drop log_mem_imm, our AIC would go up by more than 200 points.
+- Also, dropping trails_a actually decreases our AIC. The rest of the variables are helping our AIC.
+
+```{r, echo = TRUE, size = "tiny"}
+step(model1, trace = 1)
+
+```
+
+
+## Modeling with only log_mem_imm
+
+- With just one variable we can get our AIC to 1297.9, wheras using all of our variables minus log_mem_imm will give us an AIC of 1291.9
+
+```{r, echo = TRUE, size = "tiny"}
+model2 = glm(DEMENTED ~ log_mem_imm, data = nacc_unique1, family = binomial)
+summary(model2)
+
+```
+
+## Predicting with log_mem_imm Model
+
+Finally, using the formula $$ y = 3.057 + -.451 * log\_mem\_imm $$ taking the inverse logit of y, and sending those with a probability greater than .5 to having a dementia status of 1 and the rest to 0, we can achieve an accuracy of .9733. However, we must consider that 96.76% of the subjects do not have dementia.
