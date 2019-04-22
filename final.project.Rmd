@@ -1,30 +1,58 @@
 ---
 title: "Applied GLM Final Project"
-author: "Peter Shewmaker, Augie Ge, Ryan Buckland, Shawn Fries, Lauren Bergam"
-date: "April 8, 2019"
+author: "Lauren Bergam"
+date: "April 21, 2019"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, cache = TRUE}
+load(file = "alzheimers_data_filtered.Rdata")
+
 ```
 
-## R Markdown
+```{r, cache = TRUE}
+# Clean data, errant value for apoe_01
+nacc <- nacc[(nacc$apoe_01 == 0 | nacc$apoe_01 == 1), ] 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Contingency table apoe and dementia diagnosis (1st term in function is exposure, 2nd is outcome) 
+table_apoe <- table(Exposure = factor(nacc$apoe_01, levels = c("1", "0")), 
+                    Outcome = factor(nacc$DEMENTED, levels = c("1", "0")))
+table_apoe
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Fisher's test
+fisher.test(table_apoe)
 
-```{r cars}
-summary(cars)
 ```
+Interpretation: The odds of having dementia is 2.55 times more likely for individuals who are a carrier of the apolipoprotein E than those who are non-carriers. The chi-squared test gives a very small p-value and therefore, dementia and apoe carriers are not independent from each other.
 
-## Including Plots
+```{r, cache = TRUE}
+# Contingency table for age
+nacc["age_threshold"] = ifelse(nacc$age_visit > 70, 1, 0)
+age_table <- table("Age > 70" = factor(nacc$age_threshold, levels = c("1", "0")), 
+                   "Dementia" =  factor(nacc$DEMENTED, levels = c("1", "0")))
+age_table
 
-You can also embed plots, for example:
+# Fisher's test
+fisher.test(age_table)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
+Since age is a continuous variable, we choose a split value, in this case 70, to classify the data into two groups for a contingency table. 
+Interpretation: The odds of having dementia is 15.8 times more likely for individuals over the age of 70 than those who are equal to or under the age of 70. The chi-squared test gives a very small p-value and therefore, dementia and age are not independent from each other. 
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r, cache = TRUE}
+# Contingency table for animal test
+nacc["animal_threshold"] = ifelse(nacc$animal < 10, 1, 0)
+animal_table <- table("Animal < 10 " = factor(nacc$animal_threshold, levels = c("1", "0")), 
+                      "Dementia" =  factor(nacc$DEMENTED, levels = c("1", "0")))
+animal_table
+
+# Fisher's Test 
+fisher.test(animal_table)
+
+```
+Since number of animals recalled is a continuous variable, we choose a split value, in this case 10, to classify the data into two groups. 
+Interpretation: The odds of having dementia is 23.4 times more likely for individuals who can recall fewer than 10 animals within one minute than those who can recall 10 or more. The chi-squared test gives a very small p-value and therefore, dementia and the results from the animal test are not independent from each other. 
+
+
+
+
