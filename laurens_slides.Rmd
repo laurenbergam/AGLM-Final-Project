@@ -5,12 +5,12 @@ date: "April 21, 2019"
 output: pdf_document
 ---
 
-```{r, cache = TRUE}
-load(file = "alzheimers_data_filtered.Rdata")
+```{r}
+nacc <- read.csv("C:/Users/lberg/Documents/Brown/Applied GLM/Final Project/nacc_data_cognitive_clean.csv")
 
 ```
 
-```{r, cache = TRUE}
+```{r}
 # Clean data, errant value for apoe_01
 nacc <- nacc[(nacc$apoe_01 == 0 | nacc$apoe_01 == 1), ] 
 
@@ -25,7 +25,7 @@ fisher.test(table_apoe)
 ```
 Interpretation: The odds of having dementia is 2.55 times more likely for individuals who are a carrier of the apolipoprotein E than those who are non-carriers. The chi-squared test gives a very small p-value and therefore, dementia and apoe carriers are not independent from each other.
 
-```{r, cache = TRUE}
+```{r}
 # Contingency table for age
 nacc["age_threshold"] = ifelse(nacc$age_visit > 70, 1, 0)
 age_table <- table("Age > 70" = factor(nacc$age_threshold, levels = c("1", "0")), 
@@ -36,7 +36,7 @@ age_table
 fisher.test(age_table)
 
 ```
-Since age is a continuous variable, we choose a split value, in this case 70, to classify the data into two groups for a contingency table. 
+Since age is a discrete, non-binary variable, we choose a split value (in this case 70) to classify the data into two groups for a contingency table. 
 Interpretation: The odds of having dementia is 15.8 times more likely for individuals over the age of 70 than those who are equal to or under the age of 70. The chi-squared test gives a very small p-value and therefore, dementia and age are not independent from each other. 
 
 ```{r, cache = TRUE}
@@ -50,7 +50,7 @@ animal_table
 fisher.test(animal_table)
 
 ```
-Since number of animals recalled is a continuous variable, we choose a split value, in this case 10, to classify the data into two groups. 
+Since number of animals recalled is a discrete, non-binary variable, we choose a split value (in this case 10) to classify the data into two groups. 
 Interpretation: The odds of having dementia is 23.4 times more likely for individuals who can recall fewer than 10 animals within one minute than those who can recall 10 or more. The chi-squared test gives a very small p-value and therefore, dementia and the results from the animal test are not independent from each other. 
 
 
