@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library("miceadds")
 library("boot")
 library("corrplot")
+library("lmtest")
 nacc_unique1 = read.csv("C:/Brown Biostats/PHP 2514/Final Project/nacc_unique1.csv")
 
 ```
@@ -33,6 +34,7 @@ knitr::knit_hooks$set(chunk = function(x, options) {
   - dig_sym is the digit symbol test substituting digits with their respective symbols, total time to complete
   - bnt is the Boston Naming Test, subjects are to name drawings of common items, max of 30
 - DEMENTED is the dementia status of subjects, with DEMENTED = 1 being dementia.
+
   
 ## Modeling
 
@@ -51,6 +53,19 @@ cat("AIC: ", summary_model1$aic)
 - From our summary, we see that log_mem_imm has the most significant p-value. Additionally, dspan_for, dspan_back, and trails_a are not significant at the .05 level.
 - AIC is 1047.1
 
+## Likelihood Ratio Test
+
+- We compare two models, one with all of the test components and one with all of the test components minus the log_mem_imm.
+- With a chisq test statistic of 246.79, we reject the null hypothesis and conclude that the model including the log_mem_imm test is the better statistical model.
+
+```{r, echo = TRUE, size = "tiny"}
+
+model2 = glm(DEMENTED ~ dspan_for + dspan_back + animal + vegetable 
+        + trails_a + trails_b + dig_sym + bnt, data = nacc_unique1, family= binomial)
+lrtest(model1, model2)
+
+```
+
 ## Stepwise Test
 
 - Running a step test on our model shows us how our AIC would be affected if we were to drop different variables. If we were to drop log_mem_imm, our AIC would go up by more than 200 points.
@@ -67,8 +82,8 @@ step(model1, trace = 1)
 - With just one variable we can get our AIC to 1297.9, wheras using all of our variables minus log_mem_imm will give us an AIC of 1291.9
 
 ```{r, echo = TRUE, size = "tiny"}
-model2 = glm(DEMENTED ~ log_mem_imm, data = nacc_unique1, family = binomial)
-summary(model2)
+model3 = glm(DEMENTED ~ log_mem_imm, data = nacc_unique1, family = binomial)
+summary(model3)
 
 ```
 
