@@ -14,7 +14,7 @@ nacc <- read.csv("C:/Users/lberg/Documents/Brown/Applied GLM/Final Project/nacc_
 # Clean data, errant value for apoe_01
 nacc <- nacc[(nacc$apoe_01 == 0 | nacc$apoe_01 == 1), ] 
 
-# Contingency table apoe and dementia diagnosis (1st term in function is exposure, 2nd is outcome) 
+# Contingency table for apoe and dementia diagnosis 
 table_apoe <- table(Exposure = factor(nacc$apoe_01, levels = c("1", "0")), 
                     Outcome = factor(nacc$DEMENTED, levels = c("1", "0")))
 table_apoe
