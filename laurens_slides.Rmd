@@ -6,7 +6,10 @@ output: pdf_document
 ---
 
 ```{r}
-nacc <- read.csv("C:/Users/lberg/Documents/Brown/Applied GLM/Final Project/nacc_data_cognitive_clean.csv")
+library(ggplot2)
+
+load("alzheimers_data_filtered.Rdata")
+nacc <- alzheimers_data_filtered
 
 ```
 
@@ -15,15 +18,15 @@ nacc <- read.csv("C:/Users/lberg/Documents/Brown/Applied GLM/Final Project/nacc_
 nacc <- nacc[(nacc$apoe_01 == 0 | nacc$apoe_01 == 1), ] 
 
 # Contingency table for apoe and dementia diagnosis 
-table_apoe <- table(Exposure = factor(nacc$apoe_01, levels = c("1", "0")), 
-                    Outcome = factor(nacc$DEMENTED, levels = c("1", "0")))
-table_apoe
+table_apoe01 <- table("APOE Carrier" = factor(nacc$apoe_01, levels = c("1", "0")), 
+                    "Dementia" = factor(nacc$DEMENTED, levels = c("1", "0"))) 
+table_apoe01
 
 # Fisher's test
-fisher.test(table_apoe)
+fisher.test(table_apoe01)
 
 ```
-Interpretation: The odds of having dementia is 2.55 times more likely for individuals who are a carrier of the apolipoprotein E than those who are non-carriers. The chi-squared test gives a very small p-value and therefore, dementia and apoe carriers are not independent from each other.
+Interpretation: The odds of having dementia is 2.3 times more likely for individuals who are a carrier of the apolipoprotein E than those who are non-carriers. The chi-squared test gives a very small p-value and therefore, dementia and apoe carriers are not independent from each other.
 
 ```{r}
 # Contingency table for age
@@ -37,7 +40,7 @@ fisher.test(age_table)
 
 ```
 Since age is a discrete, non-binary variable, we choose a split value (in this case 70) to classify the data into two groups for a contingency table. 
-Interpretation: The odds of having dementia is 15.8 times more likely for individuals over the age of 70 than those who are equal to or under the age of 70. The chi-squared test gives a very small p-value and therefore, dementia and age are not independent from each other. 
+Interpretation: The odds of having dementia is 21.6 times more likely for individuals over the age of 70 than those who are equal to or under the age of 70. The chi-squared test gives a very small p-value and therefore, dementia and age are not independent from each other. 
 
 ```{r, cache = TRUE}
 # Contingency table for animal test
@@ -51,7 +54,53 @@ fisher.test(animal_table)
 
 ```
 Since number of animals recalled is a discrete, non-binary variable, we choose a split value (in this case 10) to classify the data into two groups. 
-Interpretation: The odds of having dementia is 23.4 times more likely for individuals who can recall fewer than 10 animals within one minute than those who can recall 10 or more. The chi-squared test gives a very small p-value and therefore, dementia and the results from the animal test are not independent from each other. 
+Interpretation: The odds of having dementia is 29.8 times more likely for individuals who can recall fewer than 10 animals within one minute than those who can recall 10 or more. The chi-squared test gives a very small p-value and therefore, dementia and the results from the animal test are not independent from each other. 
+
+```{r, cache = TRUE}
+# Contingency table for years of education
+nacc["educ_threshold"] = ifelse(nacc$educ < 12, 1, 0)
+educ_threshold <- table("# of years of education < 12 " = factor(nacc$educ_threshold, levels = c("1", "0")), 
+                        "Dementia" =  factor(nacc$DEMENTED, levels = c("1", "0")))
+educ_threshold
+
+
+# Fisher's Test
+fisher.test(educ_threshold)
+
+# Chi-squared test
+chisq.test(educ_threshold)
+
+```
+Interpretation: The odds of having dementia is 2.2 times more likely for individuals who have fewer than 12 years of education than those who have 8 years or more. The chi-squared test gives a very small p-value and therefore, dementia and years of education are not independent from each other.
+
+```{r, cache = TRUE}
+# 6x2 contingency table for APOE genotype
+apoe_table <- table(apoe_genotype = factor(nacc$apoe), Dementia = factor (nacc$DEMENTED))
+apoe_table
+
+# Convert to dataframe with frequencies for each permutation
+apoe_df <- as.data.frame(apoe_table)
+apoe_df
+
+# Plot frequency table for each genotype
+ggplot(apoe_df, aes(x = apoe_genotype, y = Freq, fill = Dementia)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  geom_text(aes(label = Freq), vjust = -0.5, size = 3, position = position_dodge(0.9))
+
+# Model the log odds of having dementia for each genotype compared to the baseline of genotype 1
+apoe_model <- glm(Dementia ~ apoe_genotype, weights = Freq, data = apoe_df, family = binomial)
+summary(apoe_model)
+
+exp(-3.77182)*100
+exp(-3.77182+0.96613)*100
+exp(-3.77182-0.05682)*100
+
+```
+Interpretation: The intercept is the log odds of having dementia given the patient has genotype 1. Exponentiating shows that the odds of having dementia given genotype 1 are 2.3%. The odds of the other genotypes are calculated relative to this baseline. The highest odds of having dementia given any of the genotypes is 6.0% for genotype 4 and the lowest odds is 2.1% for genotype 6. 
+
+
+
+
 
 
 
